@@ -1,0 +1,20 @@
+FROM continuumio/miniconda3
+
+COPY . .
+
+WORKDIR /src/stable-diffusion
+
+RUN conda env create -f environment.yaml
+
+SHELL ["conda", "run", "-n", "ldm", "/bin/bash", "-c"]
+
+WORKDIR /src
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y libgl1
+
+EXPOSE 5000
+
+ENV FLASK_APP=main.py
+
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ldm", "python", "-m", "flask", "run", "--host=0.0.0.0"]

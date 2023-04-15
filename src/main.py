@@ -16,7 +16,6 @@ def get_image():
     association = request.args.get('association')
     set_generator = SetGenerator('images', 512, 512)
     
-
     response = None
 
     filename = set_generator.generate_association(association)

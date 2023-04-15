@@ -27,6 +27,7 @@ class SetGenerator:
         self.width = width
         self.generator = StableDiffusionGenerator() # <- Генератор картинок.
         self.generator.configure(height, width)
+        self.style = ' in style of Scott Listfield'
         self.text_generator = TextGenerator()
         self.text_generator.configure(WordsProvider())
 
@@ -43,7 +44,7 @@ class SetGenerator:
         shutil.rmtree(path + '/samples')
         os.makedirs(path + '/samples')
         for i in range(size):
-            prompt = self.text_generator.generate_prompt()
+            prompt = self.text_generator.generate_prompt(self.style)
             self.generate_image(prompt, path)
 
         os.rename(temp_path, temp_path+'2')
@@ -65,7 +66,7 @@ class SetGenerator:
         except Exception as e:
             print(e)
             
-        return self.generate_image(prompt, self.path + '/associations/' + directory_path)
+        return self.generate_image(prompt + self.style, self.path + '/associations/' + directory_path)
         
     def clear_folder(self, prompt):
         try:

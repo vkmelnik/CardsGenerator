@@ -47,9 +47,9 @@ class SetGenerator:
             prompt = self.text_generator.generate_prompt(self.style)
             self.generate_image(prompt, path)
 
-        os.rename(temp_path, temp_path+'2')
-        os.rename(path, temp_path)
-        os.rename(temp_path + '2', path)
+        shutil.move(temp_path, temp_path+'2')
+        shutil.move(path, temp_path)
+        shutil.move(temp_path + '2', path)
 
         return path + '/samples'
 

@@ -25,7 +25,7 @@ class SetGenerator:
         self.path = path
         self.height = height
         self.width = width
-        self.generator = StableDiffusionGenerator() # <- Генератор картинок.
+        self.generator = MockGenerator() # <- Генератор картинок.
         self.generator.configure(height, width)
         self.style = ' in style of Scott Listfield'
         self.text_generator = TextGenerator()

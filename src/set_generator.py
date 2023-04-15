@@ -5,6 +5,8 @@ __doc__ = """
 from generators.stable_diffusion_generator import StableDiffusionGenerator
 from generators.api_generator import APIGenerator
 from generators.mock_generator import MockGenerator
+from generators.text_generator import TextGenerator
+from generators.words_provider import WordsProvider
 
 from enum import Enum
 import subprocess
@@ -23,10 +25,10 @@ class SetGenerator:
         self.path = path
         self.height = height
         self.width = width
-        self.generator = MockGenerator() # <- Генератор картинок.
+        self.generator = StableDiffusionGenerator() # <- Генератор картинок.
         self.generator.configure(height, width)
-        with open('texts/TheAdventureoftheDancingMen-ArthurConanDoyle') as f:
-            self.words = [ word for line in f for word in line.split() ]
+        self.text_generator = TextGenerator()
+        self.text_generator.configure(WordsProvider())
 
     def generate_image(self, prompt, path):
         return self.generator.generate_image(prompt, path)
@@ -41,11 +43,7 @@ class SetGenerator:
         shutil.rmtree(path + '/samples')
         os.makedirs(path + '/samples')
         for i in range(size):
-            max_index = len(self.words) - 1
-            start = random.randint(0, max(1, max_index))
-            end = min(start + random.randint(2, 5), max_index)
-            prompt = ' '.join(self.words[start:end])
-            prompt = ''.join( c for c in prompt if  c not in '?:!/;"\'' )
+            prompt = self.text_generator.generate_prompt()
             self.generate_image(prompt, path)
 
         os.rename(temp_path, temp_path+'2')

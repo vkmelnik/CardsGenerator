@@ -1,4 +1,4 @@
-from flask import Flask, send_file, request, abort, make_response, jsonify
+from flask import Flask, send_file, request, abort, make_response, jsonify, session
 import subprocess
 import base64
 import os
@@ -6,6 +6,7 @@ import os
 from set_generator import SetGenerator
 
 app = Flask(__name__)
+app.secret_key = b's\x8e\xc7\x8a!\xac\x1c_$\x03qa\t\x06\xa9\xde'
 
 @app.route('/')
 def index():
@@ -14,7 +15,7 @@ def index():
 @app.route('/picture')
 def get_image():
     association = request.args.get('association')
-    set_generator = SetGenerator('images', 512, 512)
+    set_generator = SetGenerator('images', get_height(), get_width())
     
     response = None
 
@@ -32,11 +33,11 @@ def generate_new_set():
     n = request.args.get('n')
     set_size = int(n)
 
-    set_generator = SetGenerator('images', 512, 512)
+    set_generator = SetGenerator('images', get_height(), get_width())
 
     set_generator.generate_set(set_size)
 
-    return 'Ok'
+    return make_response("Pictures are generated", 200)
 
 @app.route('/pictures')
 def get_images():
@@ -55,9 +56,24 @@ def get_images():
 
     return make_response(jsonify(images), 200)
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def set_settings():
-    return 'Ok'
+    content = request.json
+    session['width'] = content['width']
+    session['height'] = content['height']
+    return make_response("Settings are set", 200)
+
+def get_width():
+    if 'width' in session:
+        return session['width']
+    else:
+        return 512
+
+def get_height():
+    if 'height' in session:
+        return session['height']
+    else:
+        return 512
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

@@ -50,7 +50,8 @@ class SetGenerator:
 
         os.rename(temp_path, temp_path+'2')
         os.rename(path, temp_path)
-        os.rename(temp_path+'2', path)
+        os.rename(temp_path + '2', path)
+
         return path + '/samples'
 
     def generate_association(self, prompt):
@@ -60,4 +61,18 @@ class SetGenerator:
 
         Если при генерации произошла ошибка, возвращается путь к картинке по умолчанию.
         '''
-        return self.generate_image(prompt, self.path + '/associations')
+        directory_path = ''.join(c for c in prompt if  c not in '?:!/;"\' ')
+        try:
+            os.makedirs(self.path + '/associations/' + directory_path + '/samples')
+        except Exception as e:
+            print(e)
+            
+        return self.generate_image(prompt, self.path + '/associations/' + directory_path)
+        
+    def clear_folder(self, prompt):
+        try:
+            directory_path = ''.join(c for c in prompt if  c not in '?:!/;"\' ')
+            shutil.rmtree(self.path + '/associations/' + directory_path)
+        except Exception as e:
+            print(e)
+        

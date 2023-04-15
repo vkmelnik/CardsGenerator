@@ -15,12 +15,18 @@ def index():
 def get_image():
     association = request.args.get('association')
     set_generator = SetGenerator('images', 512, 512)
+    
+
+    response = None
 
     filename = set_generator.generate_association(association)
     with open(filename, "rb") as image_file:
         encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
-        return make_response(jsonify(encoded_image), 200)
-    return abort(500)
+        response = make_response(jsonify(encoded_image), 200)
+        
+    set_generator.clear_folder(association)
+    
+    return abort(500) if (response is None) else response
 
 @app.route('/new_pictures')
 def generate_new_set():
@@ -30,6 +36,7 @@ def generate_new_set():
     set_generator = SetGenerator('images', 512, 512)
 
     set_generator.generate_set(set_size)
+
     return 'Ok'
 
 @app.route('/pictures')
@@ -46,6 +53,7 @@ def get_images():
                     encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
                     images.append(encoded_image)
                     print(f'Converted {len(images)} images to base64.')
+
     return make_response(jsonify(images), 200)
 
 @app.route('/settings')

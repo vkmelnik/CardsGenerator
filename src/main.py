@@ -28,7 +28,7 @@ def get_image():
     
     return abort(500) if (response is None) else response
 
-@app.route('/new_pictures')
+@app.route('/new_pictures', methods=['GET', 'POST'])
 def generate_new_set():
     n = request.args.get('n')
     set_size = int(n)
@@ -58,10 +58,17 @@ def get_images():
 
 @app.route('/settings', methods=['GET', 'POST'])
 def set_settings():
+    message = "Settings are set"
     content = request.json
     session['width'] = content['width']
     session['height'] = content['height']
-    return make_response("Settings are set", 200)
+    if 'layer' in content:
+        try:
+            set_generator = SetGenerator('images', get_height(), get_width())
+            set_generator.save_layer(content['layer'])
+        except Exception as e:
+            message = message + " with error: " + str(e)
+    return make_response(message, 200)
 
 def get_width():
     if 'width' in session:

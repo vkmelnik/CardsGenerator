@@ -9,9 +9,12 @@ from generators.text_generator import TextGenerator
 from generators.words_provider import WordsProvider
 
 from enum import Enum
+from PIL import Image
+from io import BytesIO
 import subprocess
 import random
 import shutil
+import base64
 import os
 
 class SetGenerator:
@@ -20,19 +23,24 @@ class SetGenerator:
     '''
     class Constants(Enum):
         DEFAULT_IMAGE_NAME = 'images/default_image.png' 
+        LAYER_PATH = 'images/layer.png'
 
     def __init__(self, path, height, width):
         self.path = path
         self.height = height
         self.width = width
+
         self.generator = MockGenerator() # <- Генератор картинок.
         self.generator.configure(height, width)
+
         self.style = ' in style of Scott Listfield'
         self.text_generator = TextGenerator()
         self.text_generator.configure(WordsProvider())
 
     def generate_image(self, prompt, path):
-        return self.generator.generate_image(prompt, path)
+        output_path = self.generator.generate_image(prompt, path)
+        self.paste_layer(output_path)
+        return output_path
 
     def generate_set(self, size):
         '''
@@ -74,4 +82,19 @@ class SetGenerator:
             shutil.rmtree(self.path + '/associations/' + directory_path)
         except Exception as e:
             print(e)
-        
+
+    def paste_layer(self, path):
+        image = Image.open(path)
+        try:
+            layer = Image.open(self.Constants.LAYER_PATH.value)
+            image_w, image_h = image.size
+            layer_w, layer_h = layer.size
+            offset = ((image_w - layer_w) // 2, (image_h - layer_h) // 2)
+            image.paste(layer, offset, layer)
+            image.save(path)
+        except Exception as e:
+            print("No layer on top of image needed: ", e)
+
+    def save_layer(self, base64_image):
+        layer = Image.open(BytesIO(base64.b64decode(base64_image)))
+        layer.save(self.Constants.LAYER_PATH.value)

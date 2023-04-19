@@ -32,7 +32,9 @@ class StableDiffusionGenerator(GeneratorInterface):
         print('Generating image for ', prompt)
         try:
             subpr = subprocess.Popen(
-                f'conda run -n ldm python ./scripts/txt2img.py --prompt \'{prompt}\' --outdir \'../{path}\' --skip_grid --H {512} --W {512} --plms',
+                (f'conda run -n ldm python ./scripts/txt2img.py'
+                f' --prompt \'{prompt}\' --outdir \'../{path}\''
+                f' --skip_grid --H {512} --W {512} --plms'),
                 cwd='./stable-diffusion',
                 shell=True, stdout=None,
                 stdin=None,
@@ -43,6 +45,7 @@ class StableDiffusionGenerator(GeneratorInterface):
             sample_path = os.path.join(path, "samples")
             base_count = len(os.listdir(sample_path)) - 1
             filename = os.path.join(sample_path, f"{base_count:05}.png")
+
             self.crop_image(filename)
 
             return filename

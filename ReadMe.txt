@@ -1,7 +1,9 @@
 Установка:
 
 Скачать модель с https://github.com/CompVis/stable-diffusion и установить в папку src.
-При генерации, многие изображения могут быть ошибочно подвергнуты цензуре. При необходимости отключения цензуры, нужно в файле src/stable-diffusion/scripts/txt2img.py заменить содержимое функции def check_safety(x_image): на return x_image, False
+При генерации, многие изображения могут быть ошибочно подвергнуты цензуре.
+При необходимости отключения цензуры, нужно в файле src/stable-diffusion/scripts/txt2img.py
+заменить содержимое функции def check_safety(x_image): на return x_image, False
 
 
 Необходимо выполнить команду pip install -r requirements.txt для установки необходимых библиотек.
